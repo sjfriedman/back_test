@@ -15,7 +15,7 @@ pd.set_option('display.max_colwidth', None)
 def single_stock_compare_sp500(ticker, s_date = None, e_date = str(date.today())):
     # sets sp_data to all S&P data
     sp_data = cache.get('sp', 'market')
-    if sp_data is None:
+    if sp_data is not None:
         sp_data = si.get_data('^GSPC')
         cache.set('sp', 'market', sp_data)
 
@@ -44,6 +44,8 @@ def single_stock_compare_sp500(ticker, s_date = None, e_date = str(date.today())
     plt.plot(sp_data.index,sp_data['cum_percent_change'], label = 'S&P')
     plt.plot(stock_data.index, stock_data['cum_percent_change'], label = 'ticker'.upper())
     plt.title("S&P GAIN: " + str(round(sp_net, 2)) + "% | " + ticker.upper() + " GAIN: " + str(round(stock_net, 2)) + "%")
+    plt.text(sp_data.loc[sp_data.index == sp_data.index.max()].index, sp_data.loc[sp_data.index == sp_data.index.max()]['cum_percent_change'], '({}, {})'.format(sp_data.loc[sp_data.index == sp_data.index.max()].index.date[0], round(sp_data.loc[sp_data.index == sp_data.index.max()]['cum_percent_change'].values[0],2)))
+    plt.text(stock_data.loc[stock_data.index == stock_data.index.max()].index, stock_data.loc[stock_data.index == stock_data.index.max()]['cum_percent_change'], '({}, {})'.format(stock_data.loc[stock_data.index == stock_data.index.max()].index.date[0], round(stock_data.loc[stock_data.index == stock_data.index.max()]['cum_percent_change'].values[0],2)))
     plt.xlabel('Date')
     plt.ylabel('Percent Change')
     plt.legend()
@@ -77,6 +79,8 @@ def multi_stock_compare_sp500(tickers, s_date, e_date = str(date.today())):
 
     plt.plot(sp_data.index,sp_data['cum_percent_change'], label = 'S&P')
     plt.plot(grouped.index, grouped.values, label = 'TICKERS')
+    plt.text(sp_data.loc[sp_data.index == sp_data.index.max()].index, sp_data.loc[sp_data.index == sp_data.index.max()]['cum_percent_change'], '({}, {})'.format(sp_data.loc[sp_data.index == sp_data.index.max()].index.date[0], round(sp_data.loc[sp_data.index == sp_data.index.max()]['cum_percent_change'].values[0],2)))
+    plt.text(grouped.loc[grouped.index == grouped.index.max()].index, grouped.loc[grouped.index == grouped.index.max()].values, '({}, {})'.format(grouped.loc[grouped.index == grouped.index.max()].index.date[0], round(grouped.loc[grouped.index == grouped.index.max()].values[0],2)))
     plt.title("S&P GAIN: " + str(round(sp_net, 2)) + "% | TICKERS GAIN: " + str(round(stocks_net, 2)) + "%")
     plt.xlabel('Date')
     plt.ylabel('Percent Change')
@@ -84,9 +88,9 @@ def multi_stock_compare_sp500(tickers, s_date, e_date = str(date.today())):
     plt.show()
 
 if __name__ == "__main__":
-    single_stock_compare_sp500('aapl', '2022-01-04', '2022-10-05')
-    single_stock_compare_sp500('aapl')
-    print(multi_stock_compare_sp500(['aapl', 'msft', 'tsla', 'abnb'], '2022-01-04', '2022-10-06'))
+    single_stock_compare_sp500('aapl', '2022-01-04', '2022-10-6')
+    # single_stock_compare_sp500('aapl')
+    # print(multi_stock_compare_sp500(['aapl', 'msft', 'tsla', 'abnb'], '2022-01-04', '2022-10-06'))
 
 
 #
