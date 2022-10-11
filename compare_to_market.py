@@ -7,7 +7,6 @@ markets = {'s&p': '^GSPC', 'dow jones': '^DJI', 'nasdaq': '^IXIC'}
 # gets market comparison
 def compare_market(market, s_date, e_date):
     ticker = markets[market]
-    print(ticker)
     market_date = cache.get(market, 'market')
     if market_date is None:
         market_date = si.get_data(ticker)

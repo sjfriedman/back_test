@@ -28,8 +28,6 @@ def single_stock_compare_sp500(ticker, s_date = None, e_date = str(date.today())
     stock_data['cum_percent_change'] = (stock_data['close'] - stock_data['close'].iloc[0]) / stock_data['close'].iloc[0]
     stock_data = stock_data.fillna(0)
 
-    # print(stock_data.to_csv())
-
     # Makes sure to get S&P data for same dates as stock
     s_date = str(stock_data.index[0].date())
 

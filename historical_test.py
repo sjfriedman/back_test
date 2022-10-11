@@ -12,6 +12,7 @@ pd.set_option('display.width', None)
 pd.set_option('display.max_colwidth', None)
 
 
+# practice data
 df = pd.read_csv('/Users/SamFriedman/Downloads/sample_df - Sheet1.csv')
 print(df)
 
@@ -30,7 +31,6 @@ def test_strategy(df, market, show_stats = False):
     gains_per_stock = all_stock.groupby('sale_index')['real_percent_change'].last()
     grouped = all_stock.groupby(all_stock.index)['real_percent_change'].mean()
 
-    print(gains_per_stock)
     # gets full stock growth
     for row in df.iterrows():
         grouped.loc[grouped.index > row[1]['sell_date']] = grouped.loc[grouped.index > row[1]['sell_date']] + gains_per_stock.loc[gains_per_stock.index == row[0]].values
@@ -38,14 +38,15 @@ def test_strategy(df, market, show_stats = False):
     # gets overall growth of stratgey
     stocks_net = 100 * reduce(lambda y, z: y + z, (map(lambda x: df.iloc[x]['pct_importance'] * (all_stock.loc[(all_stock.index == df.iloc[x]['sell_date']) & (all_stock['ticker'] == df.iloc[x]['ticker'])][df.iloc[x]['sell_time']].values[0] - all_stock.loc[(all_stock.index == df.iloc[x]['buy_date']) & (all_stock['ticker'] == df.iloc[x]['ticker'])][df.iloc[x]['buy_time']].values[0]) / all_stock.loc[(all_stock.index == df.iloc[x]['buy_date']) & (all_stock['ticker'] == df.iloc[x]['ticker'])][df.iloc[x]['buy_time']].values[0], df.index)))
 
-    # gets s&p data
+    # gets market data to compare
     market_date = ctm.compare_market(market, df['buy_date'].min(), df['sell_date'].max())
 
+    # plots data
     plt.plot(market_date[0].index, 100 * market_date[0]['cum_percent_change'], label = market)
     plt.plot(grouped.index, 100 * grouped.values, label = 'TICKERS')
     plt.text(market_date[0].loc[market_date[0].index== market_date[0].index.max()].index, 100 * market_date[0].loc[market_date[0].index == market_date[0].index.max()]['cum_percent_change'], '({}, {})'.format(market_date[0].loc[market_date[0].index == market_date[0].index.max()].index.date[0], round(100 * market_date[0].loc[market_date[0].index == market_date[0].index.max()]['cum_percent_change'].values[0],2)))
     plt.text(grouped.loc[grouped.index == grouped.index.max()].index, 100 * grouped.loc[grouped.index == grouped.index.max()].values, '({}, {})'.format(grouped.loc[grouped.index == grouped.index.max()].index.date[0], round(100 * grouped.loc[grouped.index == grouped.index.max()].values[0],2)))
-    plt.title(market.upper() + " GAIN:" + str(round(market_date[1],2)) + "% | TICKERS GAIN: " + str(round(stocks_net, 2)) + "%")
+    plt.title(market.upper() + " GAIN: " + str(round(market_date[1],2)) + "% | TICKERS GAIN: " + str(round(stocks_net, 2)) + "%")
     plt.xlabel('Date')
     plt.ylabel('Percent Change')
     plt.legend()
