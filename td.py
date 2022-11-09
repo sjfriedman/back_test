@@ -42,24 +42,19 @@ def get_client():
     return c
 
 # gets stock quotes
-def data(client, options, time, x = 0):
+def data(client, tickers, time):
 
     file = "./second_data/" + str(time) + ".pkl"
     if not os.path.exists(file):
-        # gets the tickers of the top 10 movers
-        tickers = list(options['symbol'])
-
         # gets the quotes of the top 10 movers
         quotes = client.get_quotes(tickers).json()
-
-        # datetime_array that has as many dates as there are columns
-        datetime_array = [datetime.datetime.now()] * len(quotes[tickers[0]].keys())
 
         # pushes data in dataframe and adds time as multi index
         data = pd.DataFrame(quotes)
 
-
+        # pickles data
         data.to_pickle(file)
+
 
 # For testing
 if __name__ == "__main__":
@@ -69,10 +64,13 @@ if __name__ == "__main__":
     # get top 10 movers
     options = pd.DataFrame(client.get_movers('$SPX.X', client.Movers.Direction.UP, client.Movers.Change.PERCENT).json())
 
+    # gets the tickers of the top 10 movers
+    tickers = list(options['symbol'])
+
     # runs code from 9:30 to 4:00
     while True:
         time = datetime.datetime.now().time().replace(microsecond=0)
         if time >= datetime.datetime.strptime('09:30:00', "%H:%M:%S").time() and time < datetime.datetime.strptime('16:00:00', "%H:%M:%S").time():
-            data(client, options, time)
+            data(client, tickers, time)
         if time >= datetime.datetime.strptime('16:00:00', "%H:%M:%S").time():
             break
